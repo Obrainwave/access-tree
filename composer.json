@@ -1,7 +1,6 @@
 {
     "name": "obrainwave/access-tree",
     "description": "This package is to all access and permission rights in any laravel project",
-    "version": "1.0.0",
     "keywords": [
         "obrainwave",
         "laravel",
