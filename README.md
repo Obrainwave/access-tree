@@ -42,9 +42,17 @@ $data = [
      'name' => 'Admin',
      'status' => 1 or 0
    ];
-$permission_ids = [1, 5, 4];
+$permission_ids = array of permission ids // array(1, 5, 4);
 $create = createAccess($data, 'role', $permission_ids);
 echo $create;
+```
+
+Create User Role
+```php 
+$roles = array of roles // array(2, 5);
+$user_id = id of a user from laravel User Model // 1;
+$user_role = createUserRole($roles, $user_id);
+echo $user_role;
 ```
 
 ## Changelog
