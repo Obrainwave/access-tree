@@ -1,6 +1,6 @@
 <?php
 
-function createAccess(array $data, $model, array $permission_ids = [])
+function createAccess(array $data, string $model, array $permission_ids = []) : String
 {
     $model = ucfirst($model);
     switch($model)
@@ -53,7 +53,7 @@ function createAccess(array $data, $model, array $permission_ids = [])
     }
 }
 
-function updateAccess(array $data, $model, array $permission_ids = [])
+function updateAccess(array $data, string $model, array $permission_ids = []) : String
 {
     $model = ucfirst($model);
     switch($model)
@@ -114,7 +114,7 @@ function updateAccess(array $data, $model, array $permission_ids = [])
     }
 }
 
-function createUserRole(array $roles, $user_id)
+function createUserRole(array $roles, int $user_id) : String
 {
     foreach($roles as $role)
     {
@@ -134,7 +134,28 @@ function createUserRole(array $roles, $user_id)
     return json_encode(['status' => 200, 'message' => 'User Role(s) created successfully']);
 }
 
-function checkPermission($permission)
+function updateUserRole(array $roles, int $user_id) : String
+{
+    \Obrainwave\AccessTree\Models\UserRole::where('user_id', $user_id)->delete();
+    foreach($roles as $role)
+    {
+        $role = \Obrainwave\AccessTree\Models\Role::where('id', $role)->first();
+        if($role)
+        {
+            $user_role = new \Obrainwave\AccessTree\Models\UserRole();
+            $user_role->user_id = $user_id;
+            $user_role->role_id = $role->id;
+            $user_role->save();
+        }else{
+            continue;
+        }
+
+    }
+
+    return json_encode(['status' => 200, 'message' => 'User Role(s) updated successfully']);
+}
+
+function checkPermission(string $permission) : Bool
 {
     if(auth()->check())
     {
