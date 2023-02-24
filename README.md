@@ -14,14 +14,14 @@ composer require obrainwave/access-tree
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="access-tree-migrations"
+php artisan vendor:publish --tag="accesstree-migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="access-tree-config"
+php artisan vendor:publish --tag="accesstree-config"
 ```
 
 ## Usage
