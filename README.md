@@ -8,33 +8,20 @@ This package is to all access and permission rights in any laravel project
 You can install the package via composer:
 
 ```bash
-composer require :vendor_slug/:package_slug
+composer require obrainwave/access-tree
 ```
 
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag=":package_slug-migrations"
+php artisan vendor:publish --tag=":access-tree-migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag=":package_slug-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag=":package_slug-views"
+php artisan vendor:publish --tag="access-tree-config"
 ```
 
 ## Usage
@@ -42,12 +29,6 @@ php artisan vendor:publish --tag=":package_slug-views"
 ```php
 $variable = new VendorName\Skeleton();
 echo $variable->echoPhrase('Hello, VendorName!');
-```
-
-## Testing
-
-```bash
-composer test
 ```
 
 ## Changelog
@@ -64,7 +45,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [:author_name](https://github.com/:author_username)
+- [Olaiwola Akeem Salau](https://github.com/Obrainwave)
 - [All Contributors](../../contributors)
 
 ## License
