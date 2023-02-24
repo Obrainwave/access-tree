@@ -1,10 +1,10 @@
 <?php
 
-namespace VendorName\Skeleton;
+namespace Obrainwave\AccessTree;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use VendorName\Skeleton\Commands\SkeletonCommand;
+use Obrainwave\AccessTree\Commands\SkeletonCommand;
 
 class SkeletonServiceProvider extends PackageServiceProvider
 {
@@ -15,11 +15,11 @@ class SkeletonServiceProvider extends PackageServiceProvider
          *
          * More info: https://github.com/spatie/laravel-package-tools
          */
-        $package
-            ->name('skeleton')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_skeleton_table')
-            ->hasCommand(SkeletonCommand::class);
+        // $package
+        //     ->name('skeleton')
+        //     ->hasConfigFile()
+        //     ->hasViews()
+        //     ->hasMigrations(['create_permission_table', 'create_role_table'])
+        //     ->hasCommand(SkeletonCommand::class);
     }
 }

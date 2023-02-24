@@ -2,6 +2,6 @@
 
 namespace Obrainwave\AccessTree;
 
-class Skeleton
+class AccessTree
 {
 }
