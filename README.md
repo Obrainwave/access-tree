@@ -39,7 +39,7 @@ echo $create;
 Update a Permission
 ```php
 $data = [
-     'data_id' => permission id // 3,
+     'data_id' => permission id from Obrainwave\AccessTree\Models\ // 3,
      'name' => 'Add User',
      'status' => 1 or 0
    ];
@@ -73,7 +73,7 @@ echo $update;
 Create User Role
 ```php 
 $roles = array of roles // array(2, 5);
-$user_id = id of a user from laravel User Model // 1;
+$user_id = id of a user from App\Models\User // 1;
 $user_role = createUserRole($roles, $user_id);
 echo $user_role;
 ```
