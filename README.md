@@ -26,9 +26,15 @@ php artisan vendor:publish --tag="access-tree-config"
 
 ## Usage
 
+#Create a Permission or Role
 ```php
-$variable = new VendorName\Skeleton();
-echo $variable->echoPhrase('Hello, VendorName!');
+$data = [
+    'data_id' => 5,
+     'name' => 'See Auth',
+     'status' => 1
+   ];
+$create = createAccess($data, 'permission');
+echo $create;
 ```
 
 ## Changelog
