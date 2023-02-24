@@ -39,7 +39,7 @@ echo $create;
 Update a Permission
 ```php
 $data = [
-     'data_id' => permission id from Obrainwave\AccessTree\Models\ // 3,
+     'data_id' => permission id from Obrainwave\AccessTree\Models\Permission // 3,
      'name' => 'Add User',
      'status' => 1 or 0
    ];
@@ -53,7 +53,7 @@ $data = [
      'name' => 'Admin',
      'status' => 1 or 0
    ];
-$permission_ids = array of permission ids // array(1, 5, 4);
+$permission_ids = array of permission ids from Obrainwave\AccessTree\Models\Permission // array(1, 5, 4);
 $create = createAccess($data, 'role', $permission_ids);
 echo $create;
 ```
@@ -65,14 +65,14 @@ $data = [
      'name' => 'Admin Staff',
      'status' => 1 or 0
    ];
-$permission_ids = array of permission ids // array(10, 6, 3);
+$permission_ids = array of permission ids from Obrainwave\AccessTree\Models\Permission // array(10, 6, 3);
 $update = updateAccess($data, 'role', $permission_ids);
 echo $update;
 ```
 
 Create User Role
 ```php 
-$roles = array of roles // array(2, 5);
+$roles = array of roles from Obrainwave\AccessTree\Models\Role // array(2, 5);
 $user_id = id of a user from App\Models\User // 1;
 $user_role = createUserRole($roles, $user_id);
 echo $user_role;
