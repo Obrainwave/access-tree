@@ -26,14 +26,24 @@ php artisan vendor:publish --tag="access-tree-config"
 
 ## Usage
 
-#Create a Permission or Role
+Create a Permission
 ```php
 $data = [
-    'data_id' => 5,
-     'name' => 'See Auth',
-     'status' => 1
+     'name' => 'Add User',
+     'status' => 1 or 0
    ];
 $create = createAccess($data, 'permission');
+echo $create;
+```
+
+Create a Role
+```php
+$data = [
+     'name' => 'Admin',
+     'status' => 1 or 0
+   ];
+$permission_ids = [1, 5, 4];
+$create = createAccess($data, 'role', $permission_ids);
 echo $create;
 ```
 
