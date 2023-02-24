@@ -36,7 +36,18 @@ $create = createAccess($data, 'permission');
 echo $create;
 ```
 
-Create a Role
+Update a Permission
+```php
+$data = [
+     'data_id' => permission id // 3,
+     'name' => 'Add User',
+     'status' => 1 or 0
+   ];
+$update = updateAccess($data, 'permission');
+echo $update;
+```
+
+Create Roles
 ```php
 $data = [
      'name' => 'Admin',
@@ -45,6 +56,18 @@ $data = [
 $permission_ids = array of permission ids // array(1, 5, 4);
 $create = createAccess($data, 'role', $permission_ids);
 echo $create;
+```
+
+Update Roles
+```php
+$data = [
+     'data_id' => role id // 5,
+     'name' => 'Admin Staff',
+     'status' => 1 or 0
+   ];
+$permission_ids = array of permission ids // array(10, 6, 3);
+$update = updateAccess($data, 'role', $permission_ids);
+echo $update;
 ```
 
 Create User Role
