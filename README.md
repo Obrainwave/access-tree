@@ -14,7 +14,7 @@ composer require obrainwave/access-tree
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag=":access-tree-migrations"
+php artisan vendor:publish --tag="access-tree-migrations"
 php artisan migrate
 ```
 
