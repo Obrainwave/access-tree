@@ -13,7 +13,7 @@ class RoleHasPermissionFactory extends Factory
     public function definition()
     {
         return [
-
+            //
         ];
     }
 }
