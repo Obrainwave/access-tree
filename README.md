@@ -95,6 +95,11 @@ throw new \Exception("Access Forbidden", 1);
 @endif
 ```
 
+Check if a User is a Root User
+```php
+isRootUser(int user_id) // returns true or false
+```
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
