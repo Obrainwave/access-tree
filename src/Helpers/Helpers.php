@@ -230,3 +230,38 @@ function checkPermissions(array $permissions) : bool
     }
     return false;
 }
+
+function fetchPermissions(int $status = null) : Object
+{
+    if($status == null)
+    {
+        $permissions = \Obrainwave\AccessTree\Models\Permission::get();
+    }else{
+        $permissions = \Obrainwave\AccessTree\Models\Permission::where('status', $status)->get();
+    }
+
+    return $permissions;
+}
+
+function fetchRoles(int $status = null) : Object
+{
+    if($status == null)
+    {
+        $roles = \Obrainwave\AccessTree\Models\Role::get();
+    }else{
+        $roles = \Obrainwave\AccessTree\Models\Role::where('status', $status)->get();
+    }
+
+    return $roles;
+}
+
+function fetchUserRoles(int $user_id) : Object
+{
+    $user_roles = $roles = \Obrainwave\AccessTree\Models\UserRole::where('user_id', $user_id)->get();
+    foreach($user_roles as $role)
+    {
+        $role['role'] = $role->role;
+    }
+
+    return $user_roles;
+}

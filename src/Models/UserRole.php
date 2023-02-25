@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\User;
 use Obrainwave\AccessTree\Models\Role;
+use Obrainwave\AccessTree\Models\Permission;
 
 class UserRole extends Model
 {
