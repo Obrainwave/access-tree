@@ -243,6 +243,13 @@ function fetchPermissions(int $status = null) : Object
     return $permissions;
 }
 
+function fetchPermission(int $permission_id) : Object | null
+{
+    $permission = \Obrainwave\AccessTree\Models\Permission::find($permission_id);
+    
+    return $permission;
+}
+
 function fetchRoles(int $status = null) : Object
 {
     if($status == null)
@@ -253,6 +260,13 @@ function fetchRoles(int $status = null) : Object
     }
 
     return $roles;
+}
+
+function fetchRole(int $role_id) : Object | null
+{
+    $role = \Obrainwave\AccessTree\Models\Role::find($role_id);
+
+    return $role;
 }
 
 function fetchUserRoles(int $user_id) : Object
