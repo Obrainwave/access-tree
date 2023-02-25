@@ -120,6 +120,7 @@ Fetch Permissions
 ```php
 fetchPermissions(int $status) // active = 1 or inactive = 0
 // $status is optional if is empty all permissions will be fetched
+```
 
 ## Changelog
 
