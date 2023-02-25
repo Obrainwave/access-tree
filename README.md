@@ -93,10 +93,18 @@ echo $user_role;
 Check User Access or Permission
 ```php
 checkPermission(string slug_of_permission) // returns true or false
+or
+checkPermissions(array slug_of_permissions) // returns true or false
 ```
-Call the above function anywhere in your application. Example of usage:
+Call the above functions anywhere in your application. Example of usage:
 ```php
 @if(checkPermission('add_user')
+// Do some stuff
+@else
+throw new \Exception("Access Forbidden", 1);
+@endif
+
+@if(checkPermissions(['add_user', 'view_user'])
 // Do some stuff
 @else
 throw new \Exception("Access Forbidden", 1);
