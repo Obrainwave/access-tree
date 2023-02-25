@@ -155,12 +155,27 @@ function updateUserRole(array $roles, int $user_id) : String
     return json_encode(['status' => 200, 'message' => 'User Role(s) updated successfully']);
 }
 
-function checkPermission(string $permission) : Bool
+function isRootUser(int $user_id) : bool
+{
+    if(\App\Models\User::where('id', $user_id)->where('is_root_user', true)->first())
+    {
+        return true;
+    }
+
+    return false;
+}
+
+function checkPermission(string $permission) : bool
 {
     if(auth()->check())
     {
-        $user = auth()->user();
-        $user_roles = \Obrainwave\AccessTree\Models\UserRole::where('user_id', $user->id)->get();
+        $auth = auth()->user();
+        $user_roles = \Obrainwave\AccessTree\Models\UserRole::where('user_id', $auth->id)->get();
+
+        if(isRootUser($auth->id))
+        {
+            return true;
+        }
         
     }else{
         return false;
@@ -180,6 +195,5 @@ function checkPermission(string $permission) : Bool
     {
         return true;
     }
-    
     return false;
 }

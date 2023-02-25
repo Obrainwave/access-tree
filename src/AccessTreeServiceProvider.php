@@ -19,7 +19,13 @@ class AccessTreeServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             // ->hasViews()
             // ->hasRoutes(['web'])
-            ->hasMigrations(['create_permission_table', 'create_role_table', 'create_role_has_permission_table', 'create_user_role_table']);
+            ->hasMigrations([
+                'create_permission_table', 
+                'create_role_table', 
+                'create_role_has_permission_table', 
+                'create_user_role_table',
+                'add_is_root_user_to_user_table',
+            ]);
             // ->hasCommand(SkeletonCommand::class);
     }
 }
