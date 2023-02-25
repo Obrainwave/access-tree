@@ -1,6 +1,6 @@
-# This package is to all access and permission rights in any laravel project
+# Documentation, Installation, and Usage Instructions and permission rights in any laravel project
 
-This package is to all access and permission rights in any laravel project
+This package allows you to manage user permissions and roles in a database for Laravel project.
 
 
 ## Installation
