@@ -18,7 +18,7 @@ php artisan vendor:publish --tag="accesstree-migrations"
 php artisan migrate
 ```
 
-Create a Root User
+Create a Root User:
 After running migration, a new column `is_root_user` will be added to the `users` table. To create a user that can override all permissions and roles in your application, set the column to be `true`
 
 You can publish the config file with:
