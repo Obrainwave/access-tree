@@ -14,14 +14,18 @@ composer require obrainwave/access-tree
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag=":access-tree-migrations"
+php artisan vendor:publish --tag="accesstree-migrations"
 php artisan migrate
 ```
+
+Create a Root User:
+
+After running migration, a new column `is_root_user` will be added to the `users` table. To create a user that can override all permissions and roles in your application, set the column to be `true` for the particular user.
 
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="access-tree-config"
+php artisan vendor:publish --tag="accesstree-config"
 ```
 
 ## Usage
@@ -76,6 +80,32 @@ $roles = array of roles from Obrainwave\AccessTree\Models\Role // array(2, 5);
 $user_id = id of a user from App\Models\User // 1;
 $user_role = createUserRole($roles, $user_id);
 echo $user_role;
+```
+
+Update User Role
+```php
+$roles = array of roles from Obrainwave\AccessTree\Models\Role // array(2, 5);
+$user_id = id of a user from App\Models\User // 5;
+$user_role = updateUserRole($roles, $user_id);
+echo $user_role;
+```
+
+Check User Access or Permission
+```php
+checkPermission(string slug_of_permission) // returns true or false
+```
+Call the above function anywhere in your application. Example of usage:
+```php
+@if(checkPermission('add_user')
+// Do some stuff
+@else
+throw new \Exception("Access Forbidden", 1);
+@endif
+```
+
+Check if a User is a Root User
+```php
+isRootUser(int user_id) // returns true or false
 ```
 
 ## Changelog
