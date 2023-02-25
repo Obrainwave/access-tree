@@ -197,3 +197,36 @@ function checkPermission(string $permission) : bool
     }
     return false;
 }
+
+function checkPermissions(array $permissions) : bool
+{
+    if(auth()->check())
+    {
+        $auth = auth()->user();
+        $user_roles = \Obrainwave\AccessTree\Models\UserRole::where('user_id', $auth->id)->get();
+
+        if(isRootUser($auth->id))
+        {
+            return true;
+        }
+        
+    }else{
+        return false;
+    }
+    
+    $role_permissions = [];
+    foreach($user_roles as $role)
+    {
+        $rolePermissions = \Obrainwave\AccessTree\Models\RoleHasPermission::where('role_id', $role->role_id)->get();
+        
+        foreach($rolePermissions as $rolePermission)
+        {
+            $role_permissions[] = $rolePermission->permission->slug;
+        }
+    }
+    if(array_intersect($permissions, $role_permissions))
+    {
+        return true;
+    }
+    return false;
+}
