@@ -86,7 +86,7 @@ Check User Access or Permission
 ```php
 checkPermission(string slug_of_permission) // returns true or false
 ```
-Call the above function anywhere in your application. Example of useage:
+Call the above function anywhere in your application. Example of usage:
 ```php
 @if(checkPermission('add_user')
 // Do some stuff
