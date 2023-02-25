@@ -82,6 +82,14 @@ $user_role = createUserRole($roles, $user_id);
 echo $user_role;
 ```
 
+Update User Role
+```php
+$roles = array of roles from Obrainwave\AccessTree\Models\Role // array(2, 5);
+$user_id = id of a user from App\Models\User // 5;
+$user_role = updateUserRole($roles, $user_id);
+echo $user_role;
+```
+
 Check User Access or Permission
 ```php
 checkPermission(string slug_of_permission) // returns true or false
