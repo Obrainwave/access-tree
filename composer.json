@@ -1,6 +1,6 @@
 {
     "name": "obrainwave/access-tree",
-    "description": "This package is to all access and permission rights in any laravel project",
+    "description": "This package allows you to manage user permissions and roles in a database for Laravel project",
     "keywords": [
         "obrainwave",
         "laravel",
