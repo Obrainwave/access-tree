@@ -82,6 +82,19 @@ $user_role = createUserRole($roles, $user_id);
 echo $user_role;
 ```
 
+Check User Access or Permission
+```php
+checkPermission(string slug_of_permission) // returns true or false
+```
+Call the above function anywhere in your application. Example of useage:
+```php
+@if(checkPermission('add_user')
+// Do some stuff
+@else
+throw new \Exception("Access Forbidden", 1);
+@endif
+```
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
