@@ -116,6 +116,11 @@ Check if a User is a Root User
 isRootUser(int user_id) // returns true or false
 ```
 
+Fetch Permissions
+```php
+fetchPermissions(int $status) // active = 1 or inactive = 0
+// $status is optional if is empty all permissions will be fetched
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
