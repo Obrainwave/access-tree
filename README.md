@@ -116,6 +116,24 @@ Check if a User is a Root User
 isRootUser(int user_id) // returns true or false
 ```
 
+Fetch Permissions
+```php
+fetchPermissions(int $status) // active = 1 or inactive = 0
+// $status is optional if is empty all permissions will be fetched
+```
+
+Fetch Roles
+```php
+fetchRoles(int $status) // active = 1 or inactive = 0
+// $status is optional if is empty all roles will be fetched
+```
+
+Fetch User Roles
+```php
+fetchUserRoles(int $user_id)
+// $user_id is id of the user from App\Models\User
+```
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
