@@ -114,6 +114,13 @@ function updateAccess(array $data, string $model, array $permission_ids = []) : 
     }
 }
 
+function fetchRolePermissions(int $role_id) : Object
+{
+    $role_permissions = \Obrainwave\AccessTree\Models\RoleHasPermission::where('role_id', $role_id)->with(['permission', 'role'])->get();
+
+    return $role_permissions;
+}
+
 function createUserRole(array $roles, int $user_id) : String
 {
     foreach($roles as $role)
@@ -254,9 +261,9 @@ function fetchRoles(int $status = null) : Object
 {
     if($status == null)
     {
-        $roles = \Obrainwave\AccessTree\Models\Role::get();
+        $roles = \Obrainwave\AccessTree\Models\Role::with('rolePermissions.permission')->get();
     }else{
-        $roles = \Obrainwave\AccessTree\Models\Role::where('status', $status)->get();
+        $roles = \Obrainwave\AccessTree\Models\Role::with('rolePermissions.permission')->where('status', $status)->get();
     }
 
     return $roles;
@@ -264,7 +271,7 @@ function fetchRoles(int $status = null) : Object
 
 function fetchRole(int $role_id) : Object | null
 {
-    $role = \Obrainwave\AccessTree\Models\Role::find($role_id);
+    $role = \Obrainwave\AccessTree\Models\Role::where('id', $role_id)->with('rolePermissions.permission')->first();
 
     return $role ?? null;
 }
