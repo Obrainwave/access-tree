@@ -127,7 +127,12 @@ function createUserRole(array $roles, int $user_id) : String
     {
         $role = \Obrainwave\AccessTree\Models\Role::where('id', $role)->first();
         if($role)
-        {
+        { 
+            $check_role = \Obrainwave\AccessTree\Models\UserRole::where('role_id', $role->id)->where('user_id', $user_id)->first();
+            if($check_role)
+            {
+                continue;
+            }
             $user_role = new \Obrainwave\AccessTree\Models\UserRole();
             $user_role->user_id = $user_id;
             $user_role->role_id = $role->id;
@@ -285,4 +290,72 @@ function fetchUserRoles(int $user_id) : Object
     }
 
     return $user_roles;
+}
+
+function importFile($request)
+{
+    $fileMimes = array(
+        'text/x-comma-separated-values',
+        'text/comma-separated-values',
+        'application/octet-stream',
+        'application/vnd.ms-excel',
+        'application/x-csv',
+        'text/x-csv',
+        'text/csv',
+        'application/csv',
+        'application/excel',
+        'application/vnd.msexcel',
+        'text/plain'
+    );
+
+    // if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'], $fileMimes))
+    // {
+ 
+    //     // Open uploaded CSV file with read-only mode
+    //     $csvFile = fopen($_FILES['file']['tmp_name'], 'r');
+
+    //     // Skip the first line
+    //     fgetcsv($csvFile);
+
+    //     // Parse data from CSV file line by line        
+    //     while (($getData = fgetcsv($csvFile, 10000, ",")) !== FALSE)
+    //     {
+    //         // Get row data
+    //         $name = $getData[0];
+    //         $email = $getData[1];            
+
+    //         // If user already exists in the database with the same email
+    //         $query = "SELECT id FROM users WHERE email = '" . $getData[1] . "'";
+
+    //         $check = mysqli_query($con, $query);
+
+    //         if ($check->num_rows > 0)
+    //         {
+    //             mysqli_query($conn, "UPDATE users SET name = '" . $name . "', created_at = NOW() WHERE email = '" . $email . "'");
+    //         }
+    //         else
+    //         {
+    //             mysqli_query($con, "INSERT INTO users (name, email, created_at, updated_at) VALUES ('" . $name . "', '" . $email . "', NOW(), NOW())");
+    //         }
+    //     }
+
+    //     // Close opened CSV file
+    //     fclose($csvFile);
+
+    //     header("Location: index.php");         
+    // }else{
+    //     echo "Please select valid file";
+    // }
+    $file = $request->file('file');
+    $fileContents = file($file->getPathname());
+
+    foreach ($fileContents as $line) {
+        $data = str_getcsv($line);
+
+        // Product::create([
+        //     'name' => $data[0],
+        //     'price' => $data[1],
+        //     // Add more fields as needed
+        // ]);
+    }
 }
