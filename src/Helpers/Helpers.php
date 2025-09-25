@@ -1,46 +1,49 @@
 <?php
 
-function createAccess(array $data, string $model, array $permission_ids = []) : String
+use App\Models\User;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
+use Obrainwave\AccessTree\Models\Permission;
+use Obrainwave\AccessTree\Models\Role;
+use Obrainwave\AccessTree\Models\RoleHasPermission;
+use Obrainwave\AccessTree\Models\UserRole;
+use Illuminate\Support\Str;
+
+function createAccess(array $data, string $model, array $permission_ids = []): String
 {
     $model = ucfirst($model);
-    switch($model)
-    {
+    switch ($model) {
         case 'Permission':
-            $permission = new \Obrainwave\AccessTree\Models\Permission();
-            if($permission->where('name', $data['name'])->first())
-            {
+            $permission = new Permission();
+            if ($permission->where('name', $data['name'])->first()) {
                 return json_encode(['status' => 422, 'message' => 'Sorry! This permission has already been created.']);
             }
-            $permission->name = $data['name'];
-            $permission->slug = Illuminate\Support\Str::slug($data['name'], '_');
-            $permission->status = $data['status'] ?? 0;
+            $permission->name   = $data['name'];
+            $permission->slug   = Str::slug($data['name'], '_');
+            $permission->status = $data['status'] ?? 1;
             $permission->save();
             return json_encode(['status' => 200, 'message' => 'Permission created successfully']);
             break;
 
         case 'Role':
-            if(empty($permission_ids))
-            {
+            if (empty($permission_ids)) {
                 return json_encode(['status' => 422, 'message' => 'Sorry! permission_ids cannot be empty.']);
             }
-            $role = new \Obrainwave\AccessTree\Models\Role();
-            if($role->where('name', $data['name'])->first())
-            {
+            $role = new Role();
+            if ($role->where('name', $data['name'])->first()) {
                 return json_encode(['status' => 422, 'message' => 'Sorry! This role has already been created.']);
             }
-            $role->name = $data['name'];
-            $role->slug = Illuminate\Support\Str::slug($data['name'], '_');
-            $role->status = $data['status'] ?? 0;
+            $role->name   = $data['name'];
+            $role->slug   = Str::slug($data['name'], '_');
+            $role->status = $data['status'] ?? 1;
             $role->save();
 
-            foreach($permission_ids as $id)
-            {
-                if(!\Obrainwave\AccessTree\Models\Permission::find($id))
-                {
+            foreach ($permission_ids as $id) {
+                if (! Permission::find($id)) {
                     continue;
                 }
-                \Obrainwave\AccessTree\Models\RoleHasPermission::create([
-                    'role_id' => $role->id,
+                RoleHasPermission::create([
+                    'role_id'       => $role->id,
                     'permission_id' => $id,
                 ]);
             }
@@ -48,60 +51,54 @@ function createAccess(array $data, string $model, array $permission_ids = []) : 
             break;
 
         default:
-            return json_encode(['status' => 404, 'message' => 'Unknown `'.$model.'` model!']);
+            return json_encode(['status' => 404, 'message' => 'Unknown `' . $model . '` model!']);
             break;
     }
 }
 
-function updateAccess(array $data, string $model, array $permission_ids = []) : String
+function updateAccess(array $data, string $model, array $permission_ids = []): String
 {
     $model = ucfirst($model);
-    switch($model)
-    {
+    switch ($model) {
         case 'Permission':
-            $permission = new \Obrainwave\AccessTree\Models\Permission();
-            if($permission->where('name', $data['name'])->where('id', '!=', $data['data_id'])->first())
-            {
+            $permission = new Permission();
+            if ($permission->where('name', $data['name'])->where('id', '!=', $data['data_id'])->first()) {
                 return json_encode(['status' => 422, 'message' => 'Sorry! This permission has already been created.']);
             }
-            $permission = $permission->find($data['data_id']);
-            $permission->name = $data['name'];
-            $permission->slug = Illuminate\Support\Str::slug($data['name'], '_');
+            $permission         = $permission->find($data['data_id']);
+            $permission->name   = $data['name'];
+            $permission->slug   = Str::slug($data['name'], '_');
             $permission->status = $data['status'] ?? 0;
             $permission->save();
             return json_encode(['status' => 200, 'message' => 'Permission updated successfully']);
             break;
 
         case 'Role':
-            if(empty($permission_ids))
-            {
+            if (empty($permission_ids)) {
                 return json_encode(['status' => 422, 'message' => 'Sorry! permission ids cannot be empty.']);
             }
-            $check_role = new \Obrainwave\AccessTree\Models\Role();
-            if($check_role->where('name', $data['name'])->where('id', '!=', $data['data_id'])->first())
-            {
+            $check_role = new Role();
+            if ($check_role->where('name', $data['name'])->where('id', '!=', $data['data_id'])->first()) {
                 return json_encode(['status' => 422, 'message' => 'Sorry! This role has already been created.']);
             }
 
-            $role = $check_role->find($data['data_id']);
-            $role->name = $data['name'];
-            $role->slug = Illuminate\Support\Str::slug($data['name'], '_');
+            $role         = $check_role->find($data['data_id']);
+            $role->name   = $data['name'];
+            $role->slug   = Str::slug($data['name'], '_');
             $role->status = $data['status'] ?? 0;
             $role->save();
 
-            $role_permission = new \Obrainwave\AccessTree\Models\RoleHasPermission();
+            $role_permission = new RoleHasPermission();
 
             $role_permission->where('role_id', $role->id)->delete();
 
-            foreach($permission_ids as $id)
-            {
-                $permission = new \Obrainwave\AccessTree\Models\Permission();
-                if(!$permission::find($id))
-                {
+            foreach ($permission_ids as $id) {
+                $permission = new Permission();
+                if (! $permission::find($id)) {
                     continue;
                 }
                 $role_permission::create([
-                    'role_id' => $role->id,
+                    'role_id'       => $role->id,
                     'permission_id' => $id,
                 ]);
             }
@@ -109,253 +106,308 @@ function updateAccess(array $data, string $model, array $permission_ids = []) : 
             break;
 
         default:
-            return json_encode(['status' => 404, 'message' => 'Unknown `'.$model.'` model!']);
+            return json_encode(['status' => 404, 'message' => 'Unknown `' . $model . '` model!']);
             break;
     }
 }
 
-function fetchRolePermissions(int $role_id) : Object
+function fetchRolePermissions(int $role_id): Object
 {
-    $role_permissions = \Obrainwave\AccessTree\Models\RoleHasPermission::where('role_id', $role_id)->with(['permission', 'role'])->get();
+    $role_permissions = RoleHasPermission::where('role_id', $role_id)->with(['permission', 'role'])->get();
 
     return $role_permissions;
 }
 
-function createUserRole(array $roles, int $user_id) : String
+function createUserRole(array $roles, int $user_id): String
 {
-    foreach($roles as $role)
-    {
-        $role = \Obrainwave\AccessTree\Models\Role::where('id', $role)->first();
-        if($role)
-        { 
-            $check_role = \Obrainwave\AccessTree\Models\UserRole::where('role_id', $role->id)->where('user_id', $user_id)->first();
-            if($check_role)
-            {
-                continue;
-            }
-            $user_role = new \Obrainwave\AccessTree\Models\UserRole();
-            $user_role->user_id = $user_id;
-            $user_role->role_id = $role->id;
-            $user_role->save();
-        }else{
-            continue;
+    $user = User::findOrFail($user_id);
+
+    $role_ids = collect($roles)->map(function ($role) {
+        if (is_numeric($role)) {
+            return $role;
         }
 
-    }
+        if ($role instanceof Role) {
+            return $role->id;
+        }
+
+        return Role::where('slug', $role)->firstOrFail()->id;
+    });
+
+    $user->roles()->syncWithoutDetaching($role_ids);
 
     return json_encode(['status' => 200, 'message' => 'User Role(s) created successfully']);
 }
 
-function updateUserRole(array $roles, int $user_id) : String
+function updateUserRole(array $roles, int $user_id): String
 {
-    \Obrainwave\AccessTree\Models\UserRole::where('user_id', $user_id)->delete();
-    foreach($roles as $role)
-    {
-        $role = \Obrainwave\AccessTree\Models\Role::where('id', $role)->first();
-        if($role)
-        {
-            $user_role = new \Obrainwave\AccessTree\Models\UserRole();
-            $user_role->user_id = $user_id;
-            $user_role->role_id = $role->id;
-            $user_role->save();
-        }else{
-            continue;
-        }
+    $user = User::findOrFail($user_id);
 
-    }
+    // sync will attach new ones and remove missing ones
+    $user->roles()->sync($roles);
 
     return json_encode(['status' => 200, 'message' => 'User Role(s) updated successfully']);
 }
 
-function isRootUser(int $user_id) : bool
+function isRootUser(int $user_id = null): bool
 {
-    if(\App\Models\User::where('id', $user_id)->where('is_root_user', true)->first())
-    {
-        return true;
-    }
-
-    return false;
-}
-
-function checkPermission(string $permission) : bool
-{
-    if(auth()->check())
-    {
-        $auth = auth()->user();
-        $user_roles = \Obrainwave\AccessTree\Models\UserRole::where('user_id', $auth->id)->get();
-
-        if(isRootUser($auth->id))
-        {
+    if ($user_id) {
+        if (User::where('id', $user_id)->where('is_root_user', true)->first()) {
             return true;
         }
-        
-    }else{
-        return false;
-    }
-    
-    $role_permissions = [];
-    foreach($user_roles as $role)
-    {
-        $rolePermissions = \Obrainwave\AccessTree\Models\RoleHasPermission::where('role_id', $role->role_id)->get();
-        
-        foreach($rolePermissions as $rolePermission)
-        {
-            $role_permissions[] = $rolePermission->permission->slug;
-        }
-    }
-    if(in_array($permission, $role_permissions))
-    {
-        return true;
-    }
-    return false;
-}
-
-function checkPermissions(array $permissions) : bool
-{
-    if(auth()->check())
-    {
-        $auth = auth()->user();
-        $user_roles = \Obrainwave\AccessTree\Models\UserRole::where('user_id', $auth->id)->get();
-
-        if(isRootUser($auth->id))
-        {
+    } else {
+        if (User::where('id', auth()->user()->id)->where('is_root_user', true)->first()) {
             return true;
         }
-        
-    }else{
-        return false;
     }
-    
-    $role_permissions = [];
-    foreach($user_roles as $role)
-    {
-        $rolePermissions = \Obrainwave\AccessTree\Models\RoleHasPermission::where('role_id', $role->role_id)->get();
-        
-        foreach($rolePermissions as $rolePermission)
-        {
-            $role_permissions[] = $rolePermission->permission->slug;
-        }
-    }
-    if(array_intersect($permissions, $role_permissions))
-    {
-        return true;
-    }
+
     return false;
 }
 
-function fetchPermissions(int $status = null) : Object
+function checkPermission(string $permission): bool
 {
-    if($status == null)
-    {
-        $permissions = \Obrainwave\AccessTree\Models\Permission::get();
-    }else{
-        $permissions = \Obrainwave\AccessTree\Models\Permission::where('status', $status)->get();
+    $user = auth()->user();
+    if (! $user) {
+        return false;
     }
+
+    if (isRootUser($user->id)) {
+        return true;
+    }
+
+    // Check if the permission exists
+    $perm = Permission::where('slug', $permission)->first();
+    if (! $perm) {
+        // If in dev, log the warning
+        if (app()->environment('local')) {
+            \Log::warning("Permission '{$permission}' does not exist.");
+        }
+        return false; // safe default for production
+    }
+
+    // Cache the user permissions for x minutes set in the config file
+    $permissions = Cache::remember(
+        "user_{$user->id}_permissions",
+        now()->addMinutes(config('accesstree.cache_refresh_time')),
+        function () use ($user) {
+            return UserRole::where('user_id', $user->id)
+                ->with('role.permissions:id,slug')
+                ->get()
+                ->flatMap(fn($userRole) => $userRole->role->permissions->pluck('slug'))
+                ->unique()
+                ->toArray();
+        }
+    );
+
+    return in_array($permission, $permissions);
+}
+
+function checkPermissions(array $permissions, bool $strict = false): bool
+{
+    $user = auth()->user();
+    if (! $user) {
+        return false;
+    }
+
+    // Root user bypass
+    if (isRootUser($user->id)) {
+        return true;
+    }
+
+    // Warn in development if permission does not exist
+    foreach ($permissions as $permSlug) {
+        if (! Permission::where('slug', $permSlug)->exists() && app()->environment('local')) {
+            \Log::warning("Permission '{$permSlug}' does not exist.");
+        }
+    }
+
+    // Cache the user's permissions for efficiency
+    $userPermissions = Cache::remember(
+        "user_{$user->id}_permissions",
+        now()->addMinutes(config('accesstree.cache_refresh_time')),
+        function () use ($user) {
+            return UserRole::where('user_id', $user->id)
+                ->with('role.permissions:id,slug')
+                ->get()
+                ->flatMap(fn($userRole) => $userRole->role->permissions->pluck('slug'))
+                ->unique()
+                ->toArray();
+        }
+    );
+
+    if ($strict) {
+        // User must have ALL permissions
+        return empty(array_diff($permissions, $userPermissions));
+    } else {
+        // User must have AT LEAST ONE permission
+        return ! empty(array_intersect($permissions, $userPermissions));
+    }
+}
+
+function checkRole(string $role): bool
+{
+    $user = auth()->user();
+    if (! $user) {
+        return false;
+    }
+
+    // Root users bypass role checks
+    if (isRootUser($user->id)) {
+        return true;
+    }
+
+    // Check if the role exists
+    $roleModel = Role::where('slug', $role)->first();
+    if (! $roleModel) {
+        // In dev log warning
+        if (app()->environment('local')) {
+            \Log::warning("Role '{$role}' does not exist.");
+        }
+        return false; // safe default
+    }
+
+    // Cache the user roles for x minutes (set in config)
+    $roles = Cache::remember(
+        "user_{$user->id}_roles",
+        now()->addMinutes(config('accesstree.cache_refresh_time')),
+        function () use ($user) {
+            return $user->roles()
+                ->pluck('slug')
+                ->unique()
+                ->toArray();
+        }
+    );
+
+    return in_array($role, $roles);
+}
+
+function checkRoles(array $roles, bool $strict = false): bool
+{
+    $user = auth()->user();
+    if (! $user) {
+        return false;
+    }
+
+    // Root user bypass
+    if (isRootUser($user->id)) {
+        return true;
+    }
+
+    // Warn in development if role does not exist
+    foreach ($roles as $roleSlug) {
+        if (! Role::where('slug', $roleSlug)->exists() && app()->environment('local')) {
+            \Log::warning("Role '{$roleSlug}' does not exist.");
+        }
+    }
+
+    // Cache the user's roles for efficiency
+    $userRoles = Cache::remember(
+        "user_{$user->id}_roles",
+        now()->addMinutes(config('accesstree.cache_refresh_time')),
+        function () use ($user) {
+            return $user->roles()
+                ->pluck('slug')
+                ->unique()
+                ->toArray();
+        }
+    );
+
+    if ($strict) {
+        // User must have ALL roles
+        return empty(array_diff($roles, $userRoles));
+    } else {
+        // User must have AT LEAST ONE role
+        return ! empty(array_intersect($roles, $userRoles));
+    }
+}
+
+function fetchPermissions(array $options = [], int $status = 0): Object
+{
+    $data      = arrayToJson($options);
+    $order     = isset($data->order) && in_array($data->order, ['asc', 'desc']) ? strtolower($data->order) : 'desc';
+    $order_ref = isset($data->order_ref) && Schema::hasColumn('permissions', $data->order_ref) ? $data->order_ref : 'name';
+    $paginate  = isset($data->paginate) ? $data->paginate : false;
+    $per_page  = isset($data->per_page) ? $data->per_page : 10;
+
+    if ($status === 1) {
+        $permissions = Permission::where('status', $status)->orderBy($order_ref, $order);
+    } else {
+        $permissions = Permission::orderBy($order_ref, $order);
+    }
+
+    return $paginate
+        ? $permissions->paginate($per_page)
+        : $permissions->get();
+}
+
+function fetchActivePermissions(): Object
+{
+    $permissions = Permission::where('status', 1)->get();
 
     return $permissions;
 }
 
-function fetchPermission(int $permission_id) : Object | null
+function fetchPermission(int $permission_id): Object | null
 {
-    $permission = \Obrainwave\AccessTree\Models\Permission::find($permission_id);
-    
+    $permission = Permission::find($permission_id);
+
     return $permission ?? null;
 }
 
-function fetchRoles(int $status = null) : Object
+function fetchRoles(array $options = [], int $status = 0): Object
 {
-    if($status == null)
-    {
-        $roles = \Obrainwave\AccessTree\Models\Role::with('rolePermissions.permission')->get();
-    }else{
-        $roles = \Obrainwave\AccessTree\Models\Role::with('rolePermissions.permission')->where('status', $status)->get();
+    $data      = arrayToJson($options);
+    $order     = isset($data->order) && in_array($data->order, ['asc', 'desc']) ? strtolower($data->order) : 'desc';
+    $order_ref = isset($data->order_ref) && Schema::hasColumn('roles', $data->order_ref) ? $data->order_ref : 'name';
+    $paginate  = isset($data->paginate) ? $data->paginate : false;
+    $per_page  = isset($data->per_page) ? $data->per_page : 10;
+    $relation  = isset($data->with_relation) ? $data->with_relation : false;
+
+    $roles = Role::query();
+
+    if ($status === 1) {
+        $roles->where('status', $status);
     }
+
+    if ($relation) {
+        $roles->with('permissions');
+    }
+
+    $roles->orderBy($order_ref, $order);
+
+    return $paginate
+        ? $roles->paginate($per_page)
+        : $roles->get();
+}
+
+function fetchActiveRoles(): Object
+{
+    $roles = Role::where('status', 1)->get();
 
     return $roles;
 }
 
-function fetchRole(int $role_id) : Object | null
+function fetchRole(int $role_id): Object | null
 {
-    $role = \Obrainwave\AccessTree\Models\Role::where('id', $role_id)->with('rolePermissions.permission')->first();
+    $role = Role::where('id', $role_id)->with('rolePermissions.permission')->first();
 
     return $role ?? null;
 }
 
-function fetchUserRoles(int $user_id) : Object
+function fetchUserRoles(int $user_id, bool $with_relation = true): Object
 {
-    $user_roles = $roles = \Obrainwave\AccessTree\Models\UserRole::where('user_id', $user_id)->get();
-    foreach($user_roles as $role)
-    {
-        $role['role'] = $role->role;
+    if (! $with_relation) {
+        $user = User::where('id', $user_id)->with('roles')->first();
+    } else {
+        $user = User::where('id', $user_id)->with('roles.permissions')->first();
     }
 
-    return $user_roles;
+    return $user->roles;
 }
 
-function importFile($request)
+function arrayToJson(array $data): object
 {
-    $fileMimes = array(
-        'text/x-comma-separated-values',
-        'text/comma-separated-values',
-        'application/octet-stream',
-        'application/vnd.ms-excel',
-        'application/x-csv',
-        'text/x-csv',
-        'text/csv',
-        'application/csv',
-        'application/excel',
-        'application/vnd.msexcel',
-        'text/plain'
-    );
+    $data = json_decode(json_encode($data), false);
 
-    // if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'], $fileMimes))
-    // {
- 
-    //     // Open uploaded CSV file with read-only mode
-    //     $csvFile = fopen($_FILES['file']['tmp_name'], 'r');
-
-    //     // Skip the first line
-    //     fgetcsv($csvFile);
-
-    //     // Parse data from CSV file line by line        
-    //     while (($getData = fgetcsv($csvFile, 10000, ",")) !== FALSE)
-    //     {
-    //         // Get row data
-    //         $name = $getData[0];
-    //         $email = $getData[1];            
-
-    //         // If user already exists in the database with the same email
-    //         $query = "SELECT id FROM users WHERE email = '" . $getData[1] . "'";
-
-    //         $check = mysqli_query($con, $query);
-
-    //         if ($check->num_rows > 0)
-    //         {
-    //             mysqli_query($conn, "UPDATE users SET name = '" . $name . "', created_at = NOW() WHERE email = '" . $email . "'");
-    //         }
-    //         else
-    //         {
-    //             mysqli_query($con, "INSERT INTO users (name, email, created_at, updated_at) VALUES ('" . $name . "', '" . $email . "', NOW(), NOW())");
-    //         }
-    //     }
-
-    //     // Close opened CSV file
-    //     fclose($csvFile);
-
-    //     header("Location: index.php");         
-    // }else{
-    //     echo "Please select valid file";
-    // }
-    $file = $request->file('file');
-    $fileContents = file($file->getPathname());
-
-    foreach ($fileContents as $line) {
-        $data = str_getcsv($line);
-
-        // Product::create([
-        //     'name' => $data[0],
-        //     'price' => $data[1],
-        //     // Add more fields as needed
-        // ]);
-    }
+    return $data;
 }

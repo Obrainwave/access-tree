@@ -1,156 +1,425 @@
-# Documentation, Installation, and Usage Instructions and permission rights in any laravel project
+# Laravel Access Tree
 
-This package allows you to manage user permissions and roles in a database for Laravel project.
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/obrainwave/access-tree.svg?style=flat-square)](https://packagist.org/packages/obrainwave/access-tree)
+[![Total Downloads](https://img.shields.io/packagist/dt/obrainwave/access-tree.svg?style=flat-square)](https://packagist.org/packages/obrainwave/access-tree)
+[![License](https://img.shields.io/packagist/l/obrainwave/access-tree.svg?style=flat-square)](LICENSE.md)
 
+AccessTree 2.0.0 is a major release. Version 1.x is deprecated.  
+Please follow the [Upgrade Guide](UPGRADE.md) before updating.
+
+A comprehensive Laravel package for managing user permissions and roles with database-driven access control.
+
+This package is a lightweight, database-driven RBAC (roles & permissions) package for Laravel with convenient helpers, facades, caching, seeding and middleware.
+
+## Quick Start (2 minutes)
+```bash
+# 1) Require package
+composer require obrainwave/access-tree
+
+# 2) Publish migrations & config
+php artisan vendor:publish --tag="accesstree-migrations"
+php artisan vendor:publish --tag="accesstree-config"
+
+# 3) Migrate & seed (optional)
+php artisan migrate
+php artisan accesstree:seed
+
+```
+
+Add trait to your User model:
+```php
+use Obrainwave\AccessTree\Traits\HasRole;
+
+class User extends Authenticatable
+{
+    use HasRole;
+}
+```
+You're done — roles, permissions and a seeded admin are ready (if seeding enabled).
+
+## Features
+
+- **Role-Based Access Control (RBAC)**: Create and manage roles with specific permissions
+- **User Role Assignment**: Assign multiple roles to users with easy synchronization
+- **Permission Checking**: Helper functions for checking permissions and roles
+- **Root User Bypass**: Special superuser capability that bypasses all permission checks
+- **Caching System**: Built-in caching for optimal performance
+- **Blade Directives**: Easy-to-use directives for view-level authorization
+- **Customisable Seeder**: Seeder with default permissions/roles (publishable for customisation)
+- **Flexible API**: Service classes, Facades, and global helper functions
+
+## Requirements & Compatibility
+* __PHP:__ 8.1+
+* __Laravel:__ 8.x, 9.x, 10.x, 11.x, 12.x
+* The package is continuously tested on the latest stable Laravel versions.
+* Please open an issue
 
 ## Installation
 
-You can install the package via composer:
+### 1. Require via Composer
 
 ```bash
 composer require obrainwave/access-tree
 ```
-
-You can publish and run the migrations with:
-
+### Publish and Run Migrations
 ```bash
 php artisan vendor:publish --tag="accesstree-migrations"
 php artisan migrate
 ```
+After running migration, a new column `is_root_user` will be added to the users table.
 
-Create a Root User:
+## Configuration
 
-After running migration, a new column `is_root_user` will be added to the `users` table. To create a user that can override all permissions and roles in your application, set the column to be `true` for the particular user.
-
-You can publish the config file with:
-
+### Publish Config File
 ```bash
 php artisan vendor:publish --tag="accesstree-config"
 ```
 
-## Usage
-
-Create a Permission
+### Config File Options
+After publishing the config file `(config/accesstree.php)`, you can customize the package behavior:
 ```php
-$data = [
-     'name' => 'Add User',
-     'status' => 1 or 0
-   ];
-$create = createAccess($data, 'permission');
-echo $create;
+return [
+
+    'seed_permissions'            => true,
+
+    'seed_roles'                  => true,
+
+    'assign_first_user_as_admin'  => true,
+
+    'cache_refresh_time' => env('ACCESS_TREE_CACHE_MINUTES', 5),
+
+    'forbidden_redirect' => 'home',
+];
 ```
 
-Update a Permission
-```php
-$data = [
-     'data_id' => id from created permissions table when installed package // 3,
-     'name' => 'Add User',
-     'status' => 1 or 0
-   ];
-$update = updateAccess($data, 'permission');
-echo $update;
+### Publish Seeder (Optional)
+```bash
+php artisan vendor:publish --tag="accesstree-seeders"
 ```
 
-Create Roles
+### Seeding Features
+The package includes a powerful seeding system that can automatically set up your permissions and roles:
+
+#### Default Permissions Created:
+* User Management: `view user`, `add user`, `edit user`, `delete user`
+* Role Management: `view role`, `add role`, `edit role`, `delete role`
+* Permission Management: `view permission`, `add permission`, `edit permission`, `delete permission`
+* Content Management: Common CRUD operations for your application
+
+### Default Roles Created:
+* Super Admin: Has all permissions
+* Admin: Has all permissions except permission control
+* Editor: Can create, read, and update content
+
+### Seeding
+After publishing the seeder, you can customize it at `database/seeders/PermissionSeeder.php` and run:
+```bash
+ php artisan accesstree:seed
+```
+### Automatic First User as Admin
+If enabled in the config file:
 ```php
-$data = [
-     'name' => 'Admin',
-     'status' => 1 or 0
-   ];
-$permission_ids = array of ids from created permissions table when installed package // array(1, 5, 4);
-$create = createAccess($data, 'role', $permission_ids);
-echo $create;
+// config/accesstree.php
+'assign_first_user_as_admin' => true,
+```
+The package will automatically assign the very first registered user the Admin role (if it exists).
+
+* Ensures you always have at least one administrator.
+* Works only on the first user (ID=1 typically).
+* If you don’t want this behavior, simply set:
+```php
+'assign_first_user_as_admin' => false,
 ```
 
-Update Roles
+### Add Trait to User Model
 ```php
-$data = [
-     'data_id' => role id // 5,
-     'name' => 'Admin Staff',
-     'status' => 1 or 0
-   ];
-$permission_ids = array of ids from created permissions table when installed package // array(10, 6, 3);
-$update = updateAccess($data, 'role', $permission_ids);
-echo $update;
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Obrainwave\AccessTree\Traits\HasRole;
+
+class User extends Authenticatable
+{
+    use HasRole;
+}
 ```
 
-Create User Role
-```php 
-$roles = array of ids from created roles table when installed package // array(2, 5);
-$user_id = id of a user from App\Models\User // 1;
-$user_role = createUserRole($roles, $user_id);
-echo $user_role;
+## Basic Usage
+
+### Creating Permissions and Roles
+
+#### Using service class or the service facade 
+
+```php
+use Obrainwave\AccessTree\Facades\AccessTree; or use AccessTree;
+
+// Create permission
+AccessTree::createAccess([
+    'name' => 'Edit Articles',
+    'status' => 1
+], 'Permission');
+
+// Create role with permissions
+AccessTree::createAccess([
+    'name' => 'Editor',
+    'status' => 1
+], 'Role', [1, 2, 3]); // Permission IDs
 ```
 
-Update User Role
+#### Using Helper Functions
+
 ```php
-$roles = array of ids from created roles table when installed package // array(2, 5);
-$user_id = id of a user from App\Models\User // 5;
-$user_role = updateUserRole($roles, $user_id);
-echo $user_role;
+// Create permission
+createAccess(['name' => 'Delete Articles'], 'Permission');
+
+// Create role
+createAccess(['name' => 'Admin'], 'Role', [1, 2, 3, 4]);
 ```
 
-Check User Access or Permission
+### Managing User Roles
 ```php
-checkPermission(string slug_of_permission) // returns true or false
-or
-checkPermissions(array slug_of_permissions) // returns true or false
+$user = User::find(1);
+
+// Assign a single role
+$user->assignRole('admin');
+
+// Assign multiple roles
+$user->assignRoles(['editor', 'moderator']);
+
+// Sync roles (removes existing, adds new ones)
+$user->syncRoles([1, 2, 3]);
+
+// Using helper function
+createUserRole([1, 2], $user->id);
 ```
-Call the above functions anywhere in your application. Example of usage:
+
+### Checking Permissions and Roles
 ```php
-@if(checkPermission('add_user')
-// Do some stuff
-@else
-throw new \Exception("Access Forbidden", 1);
+// Check single permission
+if (checkPermission('edit_articles')) {
+    // User has permission
+}
+
+// Check multiple permissions (strict - all required)
+if (checkPermissions(['edit_articles', 'delete_articles'], true)) {
+    // User has ALL permissions
+}
+
+// Check multiple permissions (any - at least one)
+if (checkPermissions(['edit_articles', 'delete_articles'], false)) {
+    // User has AT LEAST ONE permission
+}
+
+// Check role
+if (checkRole('admin')) {
+    // User has role
+}
+
+// Using model methods
+if ($user->hasRole('admin')) {
+    // User is admin
+}
+
+if ($user->hasPermission('edit_articles')) {
+    // User can edit articles
+}
+```
+
+### Blade Directives
+```php
+@if(checkPermission('edit_articles'))
+    <button>Edit Article</button>
 @endif
 
-@if(checkPermissions(['add_user', 'view_user'])
-// Do some stuff
-@else
-throw new \Exception("Access Forbidden", 1);
+@if(checkRole('admin'))
+    <div class="admin-panel">Admin Controls</div>
+@endif
+
+@if(checkPermissions(['edit_articles', 'delete_articles'], true))
+    <div>User can both edit and delete articles</div>
 @endif
 ```
 
-Check if a User is a Root User
+### Root User Feature
 ```php
-isRootUser(int user_id) // returns true or false
+// Mark user as root
+$user = User::find(1);
+$user->is_root_user = true;
+$user->save();
+
+// Check if current user is root
+if (isRootUser()) {
+    // Bypasses all permission checks
+}
+
+// Check if specific user is root
+if (isRootUser($user->id)) {
+    // User has full access
+}
 ```
 
-Fetch Permissions
+## Middleware Usage
+Protect your routes:
 ```php
-fetchPermissions(int $status) // active = 1 or inactive = 0
-// $status is optional if is empty all permissions will be fetched
+// Single permission
+Route::get('/admin', [AdminController::class, 'index'])
+    ->middleware('accesstree:add_permission');
+
+// Multiple permissions (any)
+Route::post('/articles', [ArticleController::class, 'store'])
+    ->middleware('accesstree:create_articles,edit_articles');
+
+// Role check
+Route::delete('/articles/{id}', [ArticleController::class, 'destroy'])
+    ->middleware('accesstree:role:admin');
+```
+Middleware supports `role:slug` prefix to explicitly request role checks. It returns JSON 403 for XHR or redirects back/route with `danger` flash message.
+
+## Artisan Commands
+### Available Commands
+```bash
+# Seed default permissions and roles
+php artisan accesstree:seed
+
+# Fresh seed (WARNING: clears all access-tree tables before reseeding!)
+php artisan accesstree:seed --fresh
+
+# Publish package assets
+php artisan vendor:publish --tag=accesstree-config
+php artisan vendor:publish --tag=accesstree-migrations
+php artisan vendor:publish --tag=accesstree-seeders
 ```
 
-Fetch Roles
+### Warning:
+Unlike `php artisan migrate:fresh`, this command does not wipe your entire database.
+It will only truncate AccessTree-related tables defined in `config/accesstree.php` (by default:
+
+* `permissions`
+* `roles`
+* `role_has_permissions`
+* `user_roles`
+This ensures your application data remains safe while reseeding roles & permissions.
+
+
+## Advanced Usage
+### Using Service Directly
 ```php
-fetchRoles(int $status) // active = 1 or inactive = 0
-// $status is optional if is empty all roles will be fetched
+use Obrainwave\AccessTree\Services\AccessTreeService;
+
+$accessService = new AccessTreeService();
+
+// Update role
+$result = $accessService->updateAccess([
+    'data_id' => 1,
+    'name' => 'Senior Editor',
+    'status' => 1
+], 'Role', [1, 2, 3, 4, 5]);
+
+// Delete permission
+$result = $accessService->deleteAccess(1, 'Permission');
 ```
 
-Fetch User Roles
+### Data Retrieval
 ```php
-fetchUserRoles(int $user_id)
-// $user_id is id of the user from App\Models\User
+// Get all active permissions
+$permissions = fetchActivePermissions();
+
+// Get roles with pagination
+$roles = fetchRoles([
+    'paginate' => true,
+    'per_page' => 15,
+    'with_relation' => true,
+    'order' => 'asc',
+    'order_ref' => 'name'
+]);
+
+// Get specific role with permissions
+$role = fetchRole(1);
+
+// Get user's roles
+$userRoles = fetchUserRoles($user->id);
+
+// Get role permissions
+$rolePermissions = fetchRolePermissions($roleId);
 ```
 
-## Changelog
+## Available Methods
+### Service Class Methods
+* `createAccess(array $data, string $model, array $permission_ids = [])`
+* `updateAccess(array $data, string $model, array $permission_ids = [])`
+* `deleteAccess(int $data_id, string $model)`
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+### HasRole Trait Methods
+* `roles()` - Relationship to user's roles
+* `assignRole($role)` - Assign single role
+* `assignRoles($roles)` - Assign multiple roles
+* `syncRoles($roles)` - Sync user roles
+* `hasRole($role)` - Check if user has role
+* `permissions()` - Get user's permissions
+* `hasPermission($permission)` - Check if user has permission
 
-## Contributing
+### Helper Functions
+* `checkPermission(string $permission): bool`
+* `checkPermissions(array $permissions, bool $strict = false): bool`
+* `checkRole(string $role): bool`
+* `checkRoles(array $roles, bool $strict = false): bool`
+* `isRootUser(int $user_id = null): bool`
+* `createAccess(array $data, string $model, array $permission_ids = []): string`
+* `updateAccess(array $data, string $model, array $permission_ids = []): string`
+* `fetchPermissions(array $options = [], int $status = 0): object`
+* `fetchRoles(array $options = [], int $status = 0): object`
+* `fetchUserRoles(int $user_id, bool $with_relation = true): object`
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+## Database Schema
+The package creates these tables:
+* `permissions` - Stores permission records
+* `roles` - Stores role records
+* `role_has_permissions` - Role-permission relationships
+* `user_roles` - User-role relationships
 
-## Security Vulnerabilities
+## Caching & Performance
+* Permission and role checks are cached per-user for `cache_refresh_time` (config).
+* Use `config('accesstree.cache_refresh_time')` to control minutes.
+* If you change permissions/role assignments programmatically, make sure to clear/refresh cache for affected users if necessary.
 
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+## Testing
+Quick example using Laravel feature testing:
+```php
+public function test_admin_can_access_dashboard()
+{
+    $user = User::factory()->create();
+    AccessTree::assignRoles($user->id, ['Admin']); // or assign role id
 
-## Credits
+    $this->actingAs($user)
+         ->get('/admin')
+         ->assertStatus(200);
+}
+```
+Seeders can be run in tests to prepare default roles/permissions.
 
-- [Olaiwola Akeem Salau](https://github.com/Obrainwave)
-- [All Contributors](../../contributors)
+## API Responses & AJAX (example)
+When using the package with AJAX (e.g., to modify roles/permissions), the package returns JSON from service controllers (if you build them) and helper functions can be adapted to return structured responses (status/message). Keep errors user-friendly in production, and enable dev logging in local env.
+
+## Security
+If you discover any security issues, please email the maintainers at (<olaiwolaakeem@gmail.com>) instead of using the issue tracker.
 
 ## License
+The MIT License (MIT). Please see [LICENSE.md](LICENSE.md) for more information.
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+## Contributing
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards, testing instructions, and local development setup.
+
+
+## Roadmap
+Planned improvements:
+* Admin UI scaffolding (optional)
+* Livewire / Inertia / Filament integration examples
+* Per-tenant role scoping (multitenancy)
+* Artisan command to clear package caches
+
+If you want any roadmap item prioritized — open an issue or PR.
+
+## Acknowledgements
+Inspired by common RBAC patterns (and packages like spatie/laravel-permission). Access Tree focuses on lightweight, configurable seeding and an intuitive helper API.
+

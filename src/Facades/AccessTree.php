@@ -11,6 +11,6 @@ class AccessTree extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Obrainwave\AccessTree\AccessTree::class;
+        return \Obrainwave\AccessTree\Services\AccessTreeService::class;
     }
 }

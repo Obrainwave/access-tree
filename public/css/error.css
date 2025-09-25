@@ -1,0 +1,40 @@
+.accesstree-error-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    font-family: sans-serif;
+}
+
+.accesstree-error-box {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 500px;
+    text-align: center;
+}
+
+.accesstree-error-box h1 {
+    font-size: 1.5rem;
+    color: #dc2626; /* red-600 */
+    margin-bottom: 1rem;
+}
+
+.accesstree-error-box p {
+    color: #374151; /* gray-700 */
+    margin-bottom: 1.5rem;
+}
+
+.accesstree-error-box a {
+    background-color: #3b82f6; /* blue-500 */
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+}
+
+.accesstree-error-box a:hover {
+    background-color: #2563eb; /* blue-600 */
+}
