@@ -11,6 +11,7 @@ A comprehensive Laravel package for managing user permissions and roles with dat
 
 This package is a lightweight, database-driven RBAC (roles & permissions) package for Laravel with convenient helpers, facades, caching, seeding and middleware.
 
+
 ## Quick Start (2 minutes)
 ```bash
 # 1) Require package
@@ -37,6 +38,7 @@ class User extends Authenticatable
 ```
 You're done — roles, permissions and a seeded admin are ready (if seeding enabled).
 
+
 ## Features
 
 - **Role-Based Access Control (RBAC)**: Create and manage roles with specific permissions
@@ -48,25 +50,28 @@ You're done — roles, permissions and a seeded admin are ready (if seeding enab
 - **Customisable Seeder**: Seeder with default permissions/roles (publishable for customisation)
 - **Flexible API**: Service classes, Facades, and global helper functions
 
+
 ## Requirements & Compatibility
 * __PHP:__ 8.1+
 * __Laravel:__ 8.x, 9.x, 10.x, 11.x, 12.x
 * The package is continuously tested on the latest stable Laravel versions.
 * Please open an issue
 
+
 ## Installation
 
 ### 1. Require via Composer
-
 ```bash
 composer require obrainwave/access-tree
 ```
+
 ### Publish and Run Migrations
 ```bash
 php artisan vendor:publish --tag="accesstree-migrations"
 php artisan migrate
 ```
 After running migration, a new column `is_root_user` will be added to the users table.
+
 
 ## Configuration
 
@@ -86,7 +91,7 @@ return [
 
     'assign_first_user_as_admin'  => true,
 
-    'cache_refresh_time' => env('ACCESS_TREE_CACHE_MINUTES', 5),
+    'cache_refresh_time' => 5,
 
     'forbidden_redirect' => 'home',
 ];
@@ -116,6 +121,7 @@ After publishing the seeder, you can customize it at `database/seeders/Permissio
 ```bash
  php artisan accesstree:seed
 ```
+
 ### Automatic First User as Admin
 If enabled in the config file:
 ```php
@@ -144,6 +150,7 @@ class User extends Authenticatable
     use HasRole;
 }
 ```
+
 
 ## Basic Usage
 
@@ -259,6 +266,7 @@ if (isRootUser($user->id)) {
 }
 ```
 
+
 ## Middleware Usage
 Protect your routes:
 ```php
@@ -275,6 +283,7 @@ Route::delete('/articles/{id}', [ArticleController::class, 'destroy'])
     ->middleware('accesstree:role:admin');
 ```
 Middleware supports `role:slug` prefix to explicitly request role checks. It returns JSON 403 for XHR or redirects back/route with `danger` flash message.
+
 
 ## Artisan Commands
 ### Available Commands
@@ -293,7 +302,7 @@ php artisan vendor:publish --tag=accesstree-seeders
 
 ### Warning:
 Unlike `php artisan migrate:fresh`, this command does not wipe your entire database.
-It will only truncate AccessTree-related tables defined in `config/accesstree.php` (by default:
+It will only truncate AccessTree-related tables defined in `config/accesstree.php` (by default):
 
 * `permissions`
 * `roles`
@@ -344,6 +353,7 @@ $userRoles = fetchUserRoles($user->id);
 $rolePermissions = fetchRolePermissions($roleId);
 ```
 
+
 ## Available Methods
 ### Service Class Methods
 * `createAccess(array $data, string $model, array $permission_ids = [])`
@@ -371,6 +381,7 @@ $rolePermissions = fetchRolePermissions($roleId);
 * `fetchRoles(array $options = [], int $status = 0): object`
 * `fetchUserRoles(int $user_id, bool $with_relation = true): object`
 
+
 ## Database Schema
 The package creates these tables:
 * `permissions` - Stores permission records
@@ -378,10 +389,12 @@ The package creates these tables:
 * `role_has_permissions` - Role-permission relationships
 * `user_roles` - User-role relationships
 
+
 ## Caching & Performance
 * Permission and role checks are cached per-user for `cache_refresh_time` (config).
 * Use `config('accesstree.cache_refresh_time')` to control minutes.
 * If you change permissions/role assignments programmatically, make sure to clear/refresh cache for affected users if necessary.
+
 
 ## Testing
 Quick example using Laravel feature testing:
@@ -398,14 +411,18 @@ public function test_admin_can_access_dashboard()
 ```
 Seeders can be run in tests to prepare default roles/permissions.
 
+
 ## API Responses & AJAX (example)
 When using the package with AJAX (e.g., to modify roles/permissions), the package returns JSON from service controllers (if you build them) and helper functions can be adapted to return structured responses (status/message). Keep errors user-friendly in production, and enable dev logging in local env.
+
 
 ## Security
 If you discover any security issues, please email the maintainers at (<olaiwolaakeem@gmail.com>) instead of using the issue tracker.
 
+
 ## License
 The MIT License (MIT). Please see [LICENSE.md](LICENSE.md) for more information.
+
 
 ## Contributing
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards, testing instructions, and local development setup.
@@ -419,6 +436,7 @@ Planned improvements:
 * Artisan command to clear package caches
 
 If you want any roadmap item prioritized — open an issue or PR.
+
 
 ## Acknowledgements
 Inspired by common RBAC patterns (and packages like spatie/laravel-permission). Access Tree focuses on lightweight, configurable seeding and an intuitive helper API.
