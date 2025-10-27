@@ -9,3 +9,6 @@ phpstan.neon
 testbench.yaml
 vendor
 node_modules
+ENHANCED_README.md
+UNIVERSAL_ADMIN_GUIDE.md
+MANAGED_TABLES_GUIDE.md
