@@ -1,0 +1,555 @@
+<?php
+
+namespace Obrainwave\AccessTree\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+
+class PublishModernCSSCommand extends Command
+{
+    protected $signature = 'accesstree:publish-modern-css';
+    protected $description = 'Publish modern dashboard CSS to Laravel public directory';
+
+    public function handle()
+    {
+        $this->info('🎨 Publishing Modern Dashboard CSS...');
+        
+        try {
+            // Destination path
+            $destinationPath = public_path('css/modern-dashboard.css');
+            
+            $this->info("🎨 Creating modern dashboard CSS...");
+            
+            // Create css directory if it doesn't exist
+            $cssDir = dirname($destinationPath);
+            if (!File::exists($cssDir)) {
+                File::makeDirectory($cssDir, 0755, true);
+                $this->info("✅ Created directory: {$cssDir}");
+            }
+            
+            // Create the CSS file with the modern styles
+            $cssContent = $this->getModernCSSContent();
+            File::put($destinationPath, $cssContent);
+            $this->info("✅ Created modern CSS file at: {$destinationPath}");
+            
+            // Verify the file was copied
+            if (File::exists($destinationPath)) {
+                $this->info('✅ Modern dashboard CSS is now available!');
+                $this->line('');
+                $this->info('💡 You can now access the CSS at:');
+                $this->line("   http://your-app.com/css/modern-dashboard.css");
+                $this->line('');
+                $this->info('🔧 To use the modern theme, run:');
+                $this->line('   php artisan accesstree:configure-styling --theme=modern');
+                
+                return 0;
+            } else {
+                $this->error('❌ Failed to publish CSS file');
+                return 1;
+            }
+            
+        } catch (\Exception $e) {
+            $this->error('❌ Error publishing CSS: ' . $e->getMessage());
+            return 1;
+        }
+    }
+    
+    private function getModernCSSContent(): string
+    {
+        return '/* Modern Dashboard Styles */
+
+/* Welcome Card */
+.welcome-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"grain\" width=\"100\" height=\"100\" patternUnits=\"userSpaceOnUse\"><circle cx=\"50\" cy=\"50\" r=\"1\" fill=\"white\" opacity=\"0.1\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23grain)\"/></svg>");
+    opacity: 0.3;
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Statistics Cards */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+}
+
+.stat-card-primary {
+    --card-color: #667eea;
+    --card-color-light: #764ba2;
+}
+
+.stat-card-success {
+    --card-color: #56ab2f;
+    --card-color-light: #a8e6cf;
+}
+
+.stat-card-info {
+    --card-color: #36d1dc;
+    --card-color-light: #5b86e5;
+}
+
+.stat-card-warning {
+    --card-color: #f093fb;
+    --card-color-light: #f5576c;
+}
+
+.stat-card-body {
+    padding: 1.5rem;
+}
+
+.stat-card-content {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stat-card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--card-color), var(--card-color-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-card-info {
+    flex: 1;
+}
+
+.stat-card-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-card-label {
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+}
+
+.stat-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-card-trend {
+    color: #48bb78;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Action Cards */
+.action-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.action-card-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.action-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.action-card-subtitle {
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0 0;
+}
+
+.action-card-body {
+    padding: 1.5rem;
+}
+
+.action-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.action-btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.action-btn-success {
+    background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+    color: white;
+}
+
+.action-btn-info {
+    background: linear-gradient(135deg, #36d1dc, #5b86e5);
+    color: white;
+}
+
+.action-btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.1rem;
+}
+
+.action-btn-content {
+    flex: 1;
+}
+
+.action-btn-title {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.action-btn-subtitle {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Status Card */
+.status-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.status-card-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.status-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.status-online {
+    color: #48bb78;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #48bb78;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.status-card-body {
+    padding: 1.5rem;
+}
+
+.status-grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f7fafc;
+    border-radius: 8px;
+}
+
+.status-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    font-size: 1rem;
+}
+
+.status-item-content {
+    flex: 1;
+}
+
+.status-item-label {
+    display: block;
+    color: #718096;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.status-item-value {
+    display: block;
+    color: #2d3748;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.status-message {
+    padding: 1rem;
+    background: #f0fff4;
+    border: 1px solid #9ae6b4;
+    border-radius: 8px;
+    color: #22543d;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Activity Card */
+.activity-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.activity-card-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.activity-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.activity-card-body {
+    padding: 1.5rem;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: #edf2f7;
+    transform: translateX(5px);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    font-size: 1rem;
+}
+
+.activity-icon-success {
+    background: linear-gradient(135deg, #48bb78, #68d391);
+}
+
+.activity-icon-info {
+    background: linear-gradient(135deg, #4299e1, #63b3ed);
+}
+
+.activity-icon-warning {
+    background: linear-gradient(135deg, #ed8936, #f6ad55);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    display: block;
+    color: #2d3748;
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    display: block;
+    color: #718096;
+    font-size: 0.8rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 2rem;
+    }
+    
+    .stat-card-number {
+        font-size: 2rem;
+    }
+    
+    .action-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .stat-card,
+    .action-card,
+    .status-card,
+    .activity-card {
+        background: #1a202c;
+        border-color: #2d3748;
+    }
+    
+    .stat-card-number,
+    .action-card-title,
+    .status-card-title,
+    .activity-card-title {
+        color: #e2e8f0;
+    }
+    
+    .stat-card-label,
+    .action-card-subtitle,
+    .status-item-label {
+        color: #a0aec0;
+    }
+    
+    .activity-item {
+        background: #2d3748;
+    }
+    
+    .activity-item:hover {
+        background: #4a5568;
+    }
+}';
+    }
+}

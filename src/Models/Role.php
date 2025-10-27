@@ -17,6 +17,7 @@ class Role extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_roles')->withTimestamps();
+        $userModel = config('accesstree.user_model', 'App\\Models\\User');
+        return $this->belongsToMany($userModel, 'user_roles')->withTimestamps();
     }
 }

@@ -18,7 +18,8 @@ class UserRole extends Model
 
   public function user()
   {
-    return $this->belongsTo(User::class, 'user_id');
+    $userModel = config('accesstree.user_model', 'App\\Models\\User');
+    return $this->belongsTo($userModel, 'user_id');
   }
 
   public function role()

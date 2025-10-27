@@ -1,7 +1,33 @@
 <?php
 
-use App\Models\User;
+// User model will be resolved dynamically
 use Illuminate\Support\Facades\Cache;
+
+/**
+ * Get the User model class dynamically
+ */
+function getUserModelClass()
+{
+    $userModel = config('accesstree.user_model', 'App\\Models\\User');
+    
+    if (!class_exists($userModel)) {
+        $alternatives = [
+            'App\\User',
+            'App\\Models\\User',
+            'Illuminate\\Foundation\\Auth\\User'
+        ];
+        
+        foreach ($alternatives as $alternative) {
+            if (class_exists($alternative)) {
+                return $alternative;
+            }
+        }
+        
+        throw new \Exception('User model not found. Please configure the user model in config/accesstree.php');
+    }
+    
+    return $userModel;
+}
 use Illuminate\Support\Facades\Schema;
 use Obrainwave\AccessTree\Models\Permission;
 use Obrainwave\AccessTree\Models\Role;
@@ -120,7 +146,7 @@ function fetchRolePermissions(int $role_id): Object
 
 function createUserRole(array $roles, int $user_id): String
 {
-    $user = User::findOrFail($user_id);
+    $user = getUserModelClass()::findOrFail($user_id);
 
     $role_ids = collect($roles)->map(function ($role) {
         if (is_numeric($role)) {
@@ -141,7 +167,7 @@ function createUserRole(array $roles, int $user_id): String
 
 function updateUserRole(array $roles, int $user_id): String
 {
-    $user = User::findOrFail($user_id);
+    $user = getUserModelClass()::findOrFail($user_id);
 
     // sync will attach new ones and remove missing ones
     $user->roles()->sync($roles);
@@ -152,11 +178,11 @@ function updateUserRole(array $roles, int $user_id): String
 function isRootUser(int $user_id = null): bool
 {
     if ($user_id) {
-        if (User::where('id', $user_id)->where('is_root_user', true)->first()) {
+        if (getUserModelClass()::where('id', $user_id)->where('is_root_user', true)->first()) {
             return true;
         }
     } else {
-        if (User::where('id', auth()->user()->id)->where('is_root_user', true)->first()) {
+        if (getUserModelClass()::where('id', auth()->user()->id)->where('is_root_user', true)->first()) {
             return true;
         }
     }
@@ -397,9 +423,9 @@ function fetchRole(int $role_id): Object | null
 function fetchUserRoles(int $user_id, bool $with_relation = true): Object
 {
     if (! $with_relation) {
-        $user = User::where('id', $user_id)->with('roles')->first();
+        $user = getUserModelClass()::where('id', $user_id)->with('roles')->first();
     } else {
-        $user = User::where('id', $user_id)->with('roles.permissions')->first();
+        $user = getUserModelClass()::where('id', $user_id)->with('roles.permissions')->first();
     }
 
     return $user->roles;
